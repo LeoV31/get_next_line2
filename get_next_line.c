@@ -6,7 +6,7 @@
 /*   By: lviguier <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/21 14:31:41 by lviguier          #+#    #+#             */
-/*   Updated: 2024/06/21 18:40:23 by lviguier         ###   ########.fr       */
+/*   Updated: 2024/06/25 12:56:55 by lviguier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,9 @@ char	*get_line(char **buffer)
 		*buffer = temp;
 	}
 	else
-	{
 		line = ft_strdup(*buffer);
+	if (**buffer == '\0' || !new_line_pos)
+	{
 		free(*buffer);
 		*buffer = NULL;
 	}
@@ -52,12 +53,18 @@ char	*get_line(char **buffer)
 int	read_to_buffer(int fd, char **buffer)
 {
 	char	*new_buffer;
-	char	temp[BUFFER_SIZE + 1];
+	char	*temp;
 	int		bytes_read;
 
+	temp = malloc(BUFFER_SIZE + 1);
+	if (!temp)
+		return (-1);
 	bytes_read = read(fd, temp, BUFFER_SIZE);
 	if (bytes_read <= 0)
+	{
+		free(temp);
 		return (bytes_read);
+	}
 	temp[bytes_read] = '\0';
 	if (*buffer)
 		new_buffer = ft_strjoin(*buffer, temp);
@@ -65,6 +72,7 @@ int	read_to_buffer(int fd, char **buffer)
 		new_buffer = ft_strdup(temp);
 	free(*buffer);
 	*buffer = new_buffer;
+	free(temp);
 	return (bytes_read);
 }
 
